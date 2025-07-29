@@ -1,0 +1,105 @@
+import(Boom)
+
+importFrom("grDevices", "gray")
+importFrom("graphics", "abline", "barplot", "boxplot", "hist", "legend", "par",
+           "plot", "points", "strwidth")
+importFrom("stats", ".checkMFClasses", ".getXlevels", "as.formula", "coef",
+           "delete.response", "dt", "median", "model.frame", "model.matrix",
+           "model.matrix.default", "model.response", "na.omit", "na.pass",
+           "plogis", "plot.ts", "pnorm", "predict", "qchisq", "qlogis", "qnorm",
+           "quantile", "reshape", "rnorm", "rt", "sd", "terms", "update", "var")
+importFrom("utils", "help", "tail")
+
+export(BayesNnet,
+       BsplineBasis,
+       CoefficientGroup,
+       ConditionalZellnerPrior,
+       GetPredictorMatrix,
+       HiddenLayer,
+       IndependentSpikeSlabPrior,
+       IsplineBasis,
+       knots,
+       LogitZellnerPrior,
+       MsplineBasis,
+       MultinomialLogitSpikeSlabPrior,
+       NestedRegression,
+       OdaOptions,
+       PartialDependencePlot,
+       PlotBayesNnetPredictions,
+       PlotBayesNnetResiduals,
+       PlotLmSpikeCoefficients,
+       PlotLmSpikeResiduals,
+       PlotLmSpikeFit,
+       PlotLogitSpikeFitSummary,
+       PlotLogitSpikeResiduals,
+       PlotNetworkStructure,
+       PlotProbitSpikeResiduals,
+       PlotMarginalInclusionProbabilities,
+       PlotModelSize,
+       PoissonZellnerPrior,
+       SpikeSlabGlmPrior,
+       SpikeSlabGlmPriorDirect,
+       SpikeSlabPrior,
+       SpikeSlabPriorDirect,
+       SpikeSlabPriorBase,
+       ShrinkageRegression,
+       SsvsOptions,
+       StudentIndependentSpikeSlabPrior,
+       StudentSpikeSlabPrior,
+       SuggestBurn,
+       SummarizeSpikeSlabCoefficients,
+       lm.spike,
+       logit.spike,
+       mlm.spike,
+       model.matrix.glm.spike,
+       plot.lm.spike,
+       plot.logit.spike,
+       plot.qreg.spike,
+       plot.poisson.spike,
+       poisson.spike,
+       predict.BayesNnet,
+       predict.lm.spike,
+       predict.logit.spike,
+       predict.probit.spike,
+       predict.poisson.spike,
+       predict.qreg.spike,
+       probit.spike,
+       qreg.spike,
+       residuals.lm.spike,
+       summary.lm.spike,
+       summary.logit.spike,
+       summary.probit.spike
+)
+
+S3method(model.matrix, glm.spike)
+
+S3method(plot, lm.spike)
+S3method(predict, lm.spike)
+S3method(residuals, lm.spike)
+S3method(summary, lm.spike)
+
+S3method(print, summary.lm.spike)
+
+S3method(plot, logit.spike)
+S3method(predict, logit.spike)
+S3method(summary, logit.spike)
+
+S3method(plot, probit.spike)
+S3method(predict, probit.spike)
+S3method(summary, probit.spike)
+S3method(print, summary.probit.spike)
+
+S3method(plot, poisson.spike)
+S3method(predict, poisson.spike)
+
+S3method(plot, qreg.spike)
+S3method(predict, qreg.spike)
+
+S3method(plot, BayesNnet)
+S3method(predict, BayesNnet)
+
+S3method(print, summary.logit.spike)
+
+S3method(knots, SplineBasis)
+
+useDynLib(BoomSpikeSlab, .registration = TRUE)

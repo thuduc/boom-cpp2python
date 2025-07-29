@@ -1,0 +1,135 @@
+all:	libboom.a
+
+# When compiling remotely (e.g. on CRAN's winbuilder) flags to be
+# passed to make can be specified here.
+# -k:  keep going
+# -j 16: use 16 threads
+
+# ifeq ($(origin NOT_CRAN),undefined)
+# 	MAKEFLAGS=" -j 2 "
+# 	$(info ---- compiling with 2 cores ----)
+# else
+# 	MAKEFLAGS=" -j 32 "
+# 	$(info ---- compiling with 32 cores ----)
+# endif
+
+#
+# NOTE: A better way to supply the -j flag is with the Ncpu's argument to
+# install.packages.
+# MAKEFLAGS=" -j 32 "
+
+
+# An explanation for the cflags listed below:
+# - ADD_ is probably no longer needed.  It was necessary for communicating with
+#   Fortran, which I no longer do.
+# - R_NO_REMAP disables R macros which map things like Rf_error to error.
+# - EIGEN_WARNINGS_DISABLED: By default Eigen ignores certain warnings that it
+#   considers spurious.  This flag turns off the disabling.
+
+PKG_CPPFLAGS = -I. -I../inst/include -IBmath -Imath/cephes -DADD_ -DR_NO_REMAP -DEIGEN_WARNINGS_DISABLED
+# Sanitizers:  Uncomment one of the following lines to enable the corresponding sanitizer.
+# PKG_CXXFLAGS= -fsanitize=address
+# PKG_CXXFLAGS= -fsanitize=undefined
+# PKG_LIBS = -lprofiler
+############################################################################
+# Begin the list of all the BOOM source files.
+
+BART_SRCS := $(wildcard Models/Bart/*.cpp) \
+	  $(wildcard Models/Bart/PosteriorSamplers/*.cpp)
+
+DISTRIBUTION_SRCS := $(wildcard distributions/*.cpp)
+
+GLM_SRCS := $(wildcard Models/Glm/*.cpp Models/Glm/PosteriorSamplers/*.cpp)
+
+HIERARCHICAL_SRCS := $(wildcard Models/Hierarchical/*.cpp) \
+		  $(wildcard Models/Hierarchical/PosteriorSamplers/*.cpp)
+
+HMM_SRCS := $(wildcard Models/HMM/*.cpp) \
+	 $(wildcard Models/HMM/Clickstream/*.cpp) \
+	 $(wildcard Models/HMM/Clickstream/PosteriorSamplers/*.cpp) \
+	 $(wildcard Models/HMM/PosteriorSamplers/*.cpp)
+
+R_INTERFACE_SRCS := $(wildcard *.cpp)
+
+IRT_SRCS := $(wildcard Models/IRT/*.cpp)
+
+LINALG_SRCS := $(wildcard LinAlg/*.cpp)
+
+MATH_SRCS := $(wildcard math/cephes/*.cpp) \
+	     $(wildcard math/kissfft/*.cpp) \
+	     $(wildcard math/*.cpp)
+
+MIXTURE_SRCS := $(wildcard Models/Mixtures/*.cpp) \
+	     $(wildcard Models/Mixtures/PosteriorSamplers/*.cpp)
+
+MODELS_SRCS := $(wildcard Models/*.cpp Models/Policies/*.cpp) \
+	    $(wildcard Models/PosteriorSamplers/*.cpp)
+
+NUMOPT_SRCS := $(wildcard numopt/*.cpp)
+
+NNET_SRCS := $(wildcard Models/Nnet/*.cpp) \
+	  $(wildcard Models/Nnet/PosteriorSamplers/*.cpp)
+
+POINTPROCESS_SRCS := $(wildcard Models/PointProcess/*.cpp) \
+		  $(wildcard Models/PointProcess/PosteriorSamplers/*.cpp)
+
+RMATH_SRCS := $(wildcard Bmath/*.cpp)
+
+SAMPLERS_SRCS := $(wildcard Samplers/*.cpp Samplers/Gilks/*.cpp)
+
+STATESPACE_SRCS := $(wildcard Models/StateSpace/*.cpp) \
+	$(wildcard Models/StateSpace/Filters/*.cpp) \
+	$(wildcard Models/StateSpace/PosteriorSamplers/*.cpp) \
+	$(wildcard Models/StateSpace/StateModels/*.cpp) \
+	$(wildcard Models/StateSpace/StateModels/PosteriorSamplers/*.cpp) \
+	$(wildcard Models/StateSpace/Multivariate/*.cpp) \
+	$(wildcard Models/StateSpace/Multivariate/PosteriorSamplers/*.cpp) \
+	$(wildcard Models/StateSpace/Multivariate/StateModels/*.cpp)
+
+STATS_SRCS := $(wildcard stats/*.cpp)
+
+TARGETFUN_SRCS := $(wildcard TargetFun/*.cpp)
+
+TIMESERIES_SRCS := $(wildcard Models/TimeSeries/*.cpp) \
+		$(wildcard Models/TimeSeries/PosteriorSamplers/*.cpp)
+
+UTIL_SRCS := $(wildcard cpputil/*.cpp)
+
+CXX_SRCS = ${R_INTERFACE_SRCS} \
+	 ${BART_SRCS} \
+	${DISTRIBUTION_SRCS} \
+	${GLM_SRCS} \
+	${HIERARCHICAL_SRCS} \
+	${HMM_SRCS} \
+	${IRT_SRCS} \
+	${LINALG_SRCS} \
+	${MATH_SRCS} \
+	${MIXTURE_SRCS} \
+	${MODELS_SRCS} \
+	${NUMOPT_SRCS} \
+	${NNET_SRCS} \
+	${POINTPROCESS_SRCS} \
+	${RMATH_SRCS} \
+	${SAMPLERS_SRCS} \
+	${STATS_SRCS} \
+	${STATESPACE_SRCS} \
+	${TARGETFUN_SRCS} \
+	${TIMESERIES_SRCS} \
+	${UTIL_SRCS}
+
+CXX_STD = CXX17
+
+OBJECTS = ${CXX_SRCS:.cpp=.o}
+
+# End list of BOOM source files
+############################################################################
+
+# To remove debug symbols from the library (reducing its size by about a factor
+# of 100), uncomment the "strip" command below.  The command should stay
+# commented by default though, because removing symbols from the library is
+# prohibited by CRAN.
+#
+# To strip the library in a CRAN friendly way
+libboom.a: ${OBJECTS}
+	   ${AR} rcs $@ $^
+#	   strip --strip-debug $@

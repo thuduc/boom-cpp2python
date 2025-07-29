@@ -1,0 +1,24 @@
+The 'dynreg' package implmements a sparse dynamic Bayesian regression model.
+
+The main class is a DynamicRegressionModel: a time series regression model where
+the coefficients obey a classic state space model.  A "time point" for this
+model is a regression data set (X[t], y[t]).  The number of observations may vary
+across different values of t, but the variables in X are constant.
+
+The model is y[t] = X[t] * beta[t] + error[t], with error term error[t] ~ N(0,
+Diagonal(sigma^2)), where error[t] is independent of error[t'].
+
+The coefficient vector beta[t] has elements beta[j, t].  Let gamma[j, t] = 0 if
+beta[j, t] is zero, and gamma[j, t] = 1 otherwise.  Conditional on all previous
+gamma values, gamma[j, t] depends only on gamma[j, t-1], with probability
+determined by a Markov chain Pr(gamma[j, t] = s | gamma[j, t-1] = r) = q[r, s],
+for r, s in {0, 1}.
+
+The conditional distribution of beta[j, t] given beta[j, t-1], and given
+that both are nonzero, is normal with mean b_jt = T_ij b_jt-1, and variance
+tau^2.
+
+The model is implemented as a multivariate state space model.  Through data
+augmentation one can extend this model to most GLM's.  The current
+implementation uses a direct Gibbs sampler (see Scott 2002), but more efficient
+MCMC sampling schemes are available.

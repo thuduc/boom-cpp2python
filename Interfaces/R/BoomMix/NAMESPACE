@@ -1,0 +1,92 @@
+export(
+  CheckMixtureComponent,
+  CheckProcessSpecification,
+  ConditionalMixture,
+  DirichletProcessMvn,
+  FiniteMixture,
+  HiddenMarkovModel,
+  IndependentMvnMixtureComponent,
+  InferMixtureComponentNames,
+  LogitMixtureComponent,
+  MarkovMixtureComponent,
+  MarkovModulatedPoissonProcess,
+  MultinomialMixtureComponent,
+  MvnMixtureComponent,
+  NormalMixtureComponent,
+  PlotDensityDistribution,
+  PlotDpMvnNclusters,
+  PlotDpMvnMeans,
+  PlotDpMvnMeanPairs,
+  PlotInitialStateDistribution,
+  PlotMixingWeights,
+  PlotMixtureParams,
+  PlotProbabilityOfActivity,
+  PlotStateProbabilities,
+  PlotStateProbabilities,
+  PlotTransitionProbabilities,
+  PointProcess,
+  PoissonMixtureComponent,
+  PoissonProcessComponent,
+  RegressionMixtureComponent,
+  SimulateFakeClickstreamParams,
+  WeeklyProfile,
+  ZeroInflatedLognormalMixtureComponent,
+  ZeroInflatedPoissonMixtureComponent,
+  plot.FiniteMixture,
+  plot.HiddenMarkovModel,
+  plot.DirichletProcessMvn,
+  summary.DirichletProcessMvn,
+  HomogeneousPoissonProcess,
+  WeeklyCyclePoissonProcess,
+  SimulateWeeklyCyclePoissonProcess,
+  AverageExposureTime,
+  AverageEventRate
+  )
+
+S3method(plot, FiniteMixture)
+S3method(plot, PointProcess)
+S3method(plot, PointProcessDensity)
+S3method(plot, HiddenMarkovModel)
+S3method(plot, WeeklyProfile)
+S3method(plot, DirichletProcessMvn)
+
+S3method(summary, DirichletProcessMvn)
+
+S3method(print, WeeklyProfile)
+
+S3method(density, PointProcess)
+S3method(length, PointProcess)
+
+import(Boom, BoomSpikeSlab)
+
+importFrom("graphics",
+           "abline",
+           "axis",
+           "barplot",
+           "box",
+           "boxplot",
+           "layout",
+           "legend",
+           "par",
+           "plot",
+           "polygon",
+           "points",
+           "rug")
+
+importFrom("stats",
+           ".getXlevels",
+           "density",
+           "dnorm",
+           "model.matrix",
+           "model.response",
+           "plot.ts",
+           "rgamma",
+           "rpois",
+           "runif",
+           "sd",
+           "var"
+           )
+
+importFrom("utils", "head", "help", "tail")
+
+useDynLib(BoomMix, .registration = TRUE)

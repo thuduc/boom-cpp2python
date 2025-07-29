@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# This script is intended to be run from another script in the same directory,
+# and driven from a scipt in the parent directory.  The intended usage is
+# something like:
+#
+# PACKAGE=BoomMisc ./install/install.package $@
+#
+# Which is to say, set the PACKAGE variable, and call this script passing along
+# any command line arguments.
+
+usage () { echo "Usage: $0 [-c] [-i] 1>&2; exit 0"; }
+
+if [ ! -d ./Interfaces/R/$PACKAGE ]; then
+   echo "The requested pacakge $PACKAGE does not exist."
+   echo "Was the PACKAGE variable set correctly?"
+   exit 0
+fi
+
+DO_INSTALL=0
+DO_CHECK=0
+
+while getopts :cCi option; do
+    case "${option}" in
+        i)
+            DO_INSTALL=1
+            ;;
+        c)
+            DO_CHECK=1
+            ;;
+        C)
+            DO_CHECK_AS_CRAN=1
+            ;;
+        \?)
+	    echo "Invalid option: -$OPTARG" >&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+## If the rpackage directory does not exist then create it.
+if [ ! -d rpackage ]; then
+    mkdir rpackage
+fi
+
+PACKAGEDIR='rpackage/$PACKAGE'
+## If there is already an rpackage/$PACKAGE directory then delete it.
+if [ -d "$PACKAGEDIR" ]; then
+   rm -rf $PACKAGEDIR
+fi
+
+## Copy the package to the package directory.
+cp -r ./Interfaces/R/$PACKAGE rpackage
+cd rpackage
+if [ -d $PACKAGE/tests ]; then
+    if [ ! -d $PACKAGE/inst ]; then
+	mkdir $PACKAGE/inst
+    fi
+    mv $PACKAGE/tests $PACKAGE/inst/tests
+fi
+
+echo "PACKAGE = $PACKAGE"
+
+## Remove any previously built package tarballs.
+PACKAGE_LIST=`ls ${PACKAGE}_*.tar.gz`
+
+echo $PACKAGE_LIST
+
+if [ ${#PACKAGE_LIST} > 0 ]; then
+    rm $PACKAGE_LIST
+fi
+
+# ===========================================================================
+# Find the names of any header files that were forcibly truncated by CRAN's
+# prohibition on file names longer than 100 characters.
+#
+# This code must be kept in sync with 'create_boom_rpackage'
+
+# We need to pass the source code through sed, which on the mac is called gsed.
+if [[ $OSTYPE =~ "darwin" ]]; then
+    SED=gsed
+elif [[ $OSTYPE =~ "linux" ]]; then
+    SED=sed
+fi
+
+# The directory containing the header to be renamed.
+dbase="Models/StateSpace/Multivariate/PosteriorSamplers"
+# The specific header value, and its replacement.
+hdr="MultivariateStateSpaceModelSampler.hpp"
+new_hdr="MVSSMS.hpp"
+grep -rl "$dbase/$hdr" "$PACKAGE/src" | xargs $SED -i "s|$dbase/$hdr|$dbase/$new_hdr|g"
+
+hdr="MvStateSpaceRegressionPosteriorSampler.hpp"
+new_hdr="MVSSRPS.hpp"
+grep -rl "$dbase/$hdr" "$PACKAGE/src" | xargs $SED -i "s|$dbase/$hdr|$dbase/$new_hdr|g"
+
+hdr="SharedLocalLevelPosteriorSampler.hpp"
+new_hdr="SLLPS.hpp"
+grep -rl "$dbase/$hdr" "$PACKAGE/src" | xargs $SED -i "s|$dbase/$hdr|$dbase/$new_hdr|g"
+
+dbase="Models/StateSpace/StateModels/PosteriorSamplers"
+hdr="GeneralSeasonalLLTPosteriorSampler.hpp"
+new_hdr="GSLLTPS.hpp"
+grep -rl "$dbase/$hdr" "$PACKAGE/src" | xargs $SED -i "s|$dbase/$hdr|$dbase/$new_hdr|g"
+# ===========================================================================
+
+RPROG=R
+# If multiple versions of R are installed then the shell variable above can be
+# used to distinguish among them.
+
+# RPROG=RDcsan
+
+echo "Building $PACKAGE"
+$RPROG CMD build $PACKAGE
+
+PACKAGE_VERSION=`ls ${PACKAGE}_*.tar.gz`
+
+if [[ $DO_CHECK = 1 ]]; then
+    echo "Checking $PACKAGE"
+    MAKEFLAGS=" -j 16 " $RPROg CMD check $PACKAGE_VERSION
+fi
+
+if [[ $DO_CHECK_AS_CRAN = 1 ]]; then
+    echo "Checking $PACKAGE"
+    MAKEFLAGS=" -j 16 " $RPROG CMD check --as-cran $PACKAGE_VERSION
+fi
+
+if [[ $DO_INSTALL = 1 ]]; then
+    echo "Installing $PACKAGE"
+    MAKEFLAGS=" -j 16 " $RPROG CMD INSTALL $PACKAGE_VERSION
+fi
+echo "PACKAGE = $PACKAGE"

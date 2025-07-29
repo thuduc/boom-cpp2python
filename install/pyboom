@@ -1,0 +1,232 @@
+#!/bin/bash
+set -euo pipefail
+
+# source "$HOME/pyboom/bin/activate"
+
+# This script copies the BOOM library into a format suitable for exporting into
+# python.  It puts the 'setup.py' script and package files at the top, copies
+# the C++ library below, and puts the pybind11 bindings in a pybind11 folder.
+#
+# On exit, the .../python_package/BayesBoom directory is suitable for
+# installation with pip.
+
+help_message="\n -p Publish package to PyPi after installing."
+
+usage () { echo "Usage: $0 [-p] $help_message 1>&2; exit 0"; }
+
+while getopts :ci option; do
+    case "${option}" in
+        \?)
+	    echo "Invalid option: -$OPTARG" >&2
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+PACKAGE_DIR='python_package/BayesBoom'
+BOOM_DIR=$PACKAGE_DIR'/boom'
+
+echo "PACKAGE_DIR is $PACKAGE_DIR"
+echo "BOOM_DIR is $BOOM_DIR"
+
+## If there is already a Boom directory then delete it.
+if [ -d "$PACKAGE_DIR" ]; then
+    echo "Removing previous directory $PACKAGE_DIR"
+    rm -rf $PACKAGE_DIR
+fi
+mkdir -p $PACKAGE_DIR
+
+## Copy non-cpp packages to the package directory
+cp -r Interfaces/python/R/BayesBoom/R $PACKAGE_DIR/R
+cp -r Interfaces/python/bayesreg/BayesBoom/bayesreg $PACKAGE_DIR/bayesreg
+cp -r Interfaces/python/bsts/BayesBoom/bsts $PACKAGE_DIR/bsts
+cp -r Interfaces/python/dynreg/BayesBoom/dynreg $PACKAGE_DIR/dynreg
+cp -r Interfaces/python/factormodels/BayesBoom/factormodels $PACKAGE_DIR/factormodels
+cp -r Interfaces/python/mixtures/BayesBoom/mixtures $PACKAGE_DIR/mixtures
+cp -r Interfaces/python/impute/BayesBoom/impute $PACKAGE_DIR/impute
+cp -r Interfaces/python/spikeslab/BayesBoom/spikeslab $PACKAGE_DIR/spikeslab
+cp -r Interfaces/python/test_utils/BayesBoom/test_utils $PACKAGE_DIR/test_utils
+
+## create a Boom subdirectory and copy the relevant files into it.
+mkdir -p $BOOM_DIR
+echo "Copying top level files"
+cp Interfaces/python/BayesBoom/*.py $BOOM_DIR
+mv $BOOM_DIR/setup.py $PACKAGE_DIR/..
+
+cp Interfaces/python/BayesBoom/MANIFEST.in $PACKAGE_DIR/..
+
+##----------------------------------------------------------------------
+## Source:
+## Create the source directory and copy top-level files.
+backup_files=`find . -name "\.#*"`
+if [ ! -z $backup_files ]
+then
+    echo "Removing backup files: $backup_files"
+    rm $backup_files
+fi
+
+echo "Copying source files"
+## Populate the various source directories.
+SRCS=`find Bmath -name "*.cpp"`
+SRCS="$SRCS `find cpputil -name "*.cpp"`"
+SRCS="$SRCS `find distributions -name "*.cpp"`"
+SRCS="$SRCS `find LinAlg -name "*.cpp"`"
+SRCS="$SRCS `find math -name "*.cpp"`"
+SRCS="$SRCS `find Models -name "*.cpp"`"
+SRCS="$SRCS `find numopt -name "*.cpp"`"
+SRCS="$SRCS `find Samplers -name "*.cpp"`"
+SRCS="$SRCS `find stats -name "*.cpp"`"
+SRCS="$SRCS `find TargetFun -name "*.cpp"`"
+SRCS="$SRCS `find test_utils -name "*.cpp"`"
+
+./install/install_headers.py $SRCS $BOOM_DIR/
+
+echo "Done copying source files."
+
+##----------------------------------------------------------------------
+## Copy the pybind11 bindings
+echo "copying pybind11 bindings"
+mkdir $BOOM_DIR/pybind11
+if [[ $OSTYPE =~ "darwin" ]]; then
+    echo "This looks like a mac.  Copying files with ditto."
+    ditto Interfaces/python/BayesBoom/ $BOOM_DIR/pybind11
+elif [[ $OSTYPE =~ "linux" ]]; then
+    echo "This looks like linux.  Copying files with cp -R."
+    cp -R Interfaces/python/BayesBoom/* $BOOM_DIR/pybind11
+else
+    echo "ERROR copying files.  Could not determine the OS."
+fi
+mv $BOOM_DIR/pybind11/__init__.py $BOOM_DIR
+
+echo "done copying pybind11 bindings"
+
+##----------------------------------------------------------------------
+## Headers:
+## Create the include directory, and add in the top level header files.
+echo "copying headers"
+mkdir -p $BOOM_DIR/include
+cp *.hpp $BOOM_DIR
+
+## Put a couple of local implementation files in the source directories that
+## expect them.
+echo "copying cephus to $BOOM_DIR/math/cephes/cephus_impl.hpp"
+cp math/cephes/cephes_impl.hpp $BOOM_DIR/math/cephes/cephus_impl.hpp
+cp Bmath/*.hpp $BOOM_DIR/Bmath
+echo "done copying cephus"
+
+## Copy the bulk of the header files to the relevant sub directories.
+HDRS=`find Bmath -name "*.hpp"`
+HDRS="$HDRS `find cpputil -name "*.hpp"`"
+HDRS="$HDRS `find distributions -name "*.hpp"`"
+HDRS="$HDRS `find LinAlg -name "*.hpp"`"
+HDRS="$HDRS `find math -name "*.hpp"`"
+HDRS="$HDRS `find Models -name "*.hpp"`"
+HDRS="$HDRS `find numopt -name "*.hpp"`"
+HDRS="$HDRS `find Samplers -name "*.hpp"`"
+HDRS="$HDRS `find stats -name "*.hpp"`"
+HDRS="$HDRS `find TargetFun -name "*.hpp"`"
+HDRS="$HDRS `find test_utils -name "*.hpp"`"
+HDRS="$HDRS `find Eigen -name "*.h"`"
+./install/install_headers.py $HDRS $BOOM_DIR/
+echo "done copying headers"
+
+if [[ $OSTYPE =~ "darwin" ]]; then
+    # On Linux this would be cp --parents, but that option does
+    # not exist on OS X.
+    echo "This looks like a Mac.  Copying Eigen files with ditto."
+    ditto  Eigen/ $BOOM_DIR/Eigen/
+    #echo "Ignore the message about not being able to copy Eigen/src."
+elif [[ $OSTYPE =~ "linux" ]]; then
+    echo "This looks like Linux.  Copying Eigen files with cp --parents."
+    cp -R Eigen/* $BOOM_DIR/Eigen/
+else
+    echo "Unfamiliar OS.  I'm not going to copy Eigen files."
+fi
+
+##----------------------------------------------------------------------
+## Build and install the package:
+echo "Time to build the package!"
+
+PYTHON="python3"
+if command -v python &> /dev/null
+then
+    # This branch gets entered if the python command exists on the path.  We
+    # still need to check that it is python3 and not python 2.something.
+    echo "Checking if python is version 2 or 3"
+    python_version=$(python --version)
+    major_version=$(echo ${python_version:7:1})
+    if [[ major_version -ge 3 ]]
+    then
+	echo "python is version 3"
+	PYTHON="python"
+    fi
+else
+    echo "I will use python3 as the default"
+fi
+
+##---------------------------------------------------------------------------
+## Find the right 'pip' command.
+
+# echo "Running ensurepip with $PYTHON"
+# $PYTHON -m ensurepip --upgrade
+
+if command -v pip &> /dev/null
+then
+    # pip --version prints something like
+    # pip 23.2.1 from /lib/python3.9/site-packages/pip (python 3.9)
+    # The thing in spot 6 is the python version number that pip works with.
+    echo "pip command exists -- checking whether it installs to python3"
+    pip_version=$(pip --version | awk -F' ' '{print $6}')
+    pip_major_version=${pip_version:0:1}
+    if [[ $pip_major_version -ge 3 ]]
+    then
+	echo "pip installs to python3.  Setting PIP = pip"
+	PIP="pip"
+    else
+	echo "pip does not install to python3.  Setting PIP = pip3"
+	PIP="pip3"
+    fi
+else
+    echo "pip command not found -- assuming that pip3 exists"
+    PIP="pip3"
+fi
+
+echo "python is $PYTHON"
+echo "pip is $PIP"
+
+echo `which python`
+echo `which $PYTHON`
+echo `which pip`
+echo `which $PIP`
+
+cd python_package
+$PYTHON setup.py sdist bdist_wheel
+# python -m pip install dist/BayesBoom-*.whl
+# CC="ccache clang++" CXX="ccache"
+# pip --verbose install ./BayesBoom
+
+echo "======================================================================"
+cd dist
+echo "Installing the package with pip"
+$PIP install `ls -t BayesBoom-*.whl | head -1` --force-reinstall
+
+##----------------------------------------------------------------------
+## Install the pure python packages
+# cd ..
+# pip install Interfaces/python/R
+# pip install Interfaces/python/bsts
+# pip install Interfaces/python/spikeslab
+echo "======================================================================"
+echo "To publish to pypi:"
+echo "twine upload dist/BayesBoom-VERSION.*"
+echo "======================================================================"
+echo "To build manylinux wheel:"
+echo "docker build -t pyboom ."
+echo "docker run -v /tmp:/export  --rm -it pyboom cp /output/BayesBoom-0.1.13-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl /export/."
+echo "The built wheel will be in /tmp"
+echo "To run these commands interactively, do "
+echo "docker run -v /tmp:/export -i -t pyboom /bin/bash"
+echo "cd /output"
+echo "mv BayesBoom-x.y.zz-*manylinux*.whl /export"
+echo "exit"
