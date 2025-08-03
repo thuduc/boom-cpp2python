@@ -1,14 +1,21 @@
-# Proof-of-concept: C++ to Python migration using Claude Code
-BOOM (C++ library for Bayesian modeling) source repo is located at https://github.com/steve-the-bayesian/BOOM
+## GenAI Proof of Concept: C++ to Python conversion using Claude Code
 
-This POC is to evaluate Claude Code (an agentic coding tool from Anthropic: https://www.anthropic.com/claude-code) for its ability to convert a modeling library written in C++ to Python.
+The purpose of this proof of concept is to find out if an LLM can take an existing complex  C++ codebase and converted it to Python. The project we will be using for this PoC is this BOOM C++ library for Bayesian modeling: https://github.com/steve-the-bayesian/BOOM
+
+### LLM & AI Tool
+* LLM used: Claude Opus 4 (best coding LLM) - https://www.anthropic.com/claude/opus
+* AI tool used: Claude Code (best coding CLI due to its integration with Clause 4 LLMs) - https://www.anthropic.com/claude-code
 
 #### Conversion Process: 
-* Step 1 - use a reasoning LLM that's able to analyze an existing code repository, then put together a comprehensive migration plan for converting the entire project's codebase from C++ to Python. We used Anthropic's Claude Opus 4 LLM for our reasoning LLM. We chose Opus 4 over OpenAI's ChatGPT o3 (advanded reasoning) and Google Gemini 2.5 Pro (reasoning) due to its advanced ability to analyze code. 
-* Step 2 - use this migration plan (see migration_plan.md) with Claude Code (together with Claude Opus 4 LLM, known as the most advanded model for agentic coding tasks) to implement all tasks in all phases defined in the migration plan. The migration plan includes requirements for comprehensive code coverage via unit and integration testing.
+* Step 1 - use Claude Code (together with Opus 4 LLM) to analyze an existing code repository, then ask it to put together a comprehensive conversion plan for converting the entire codebase from C++ to Python. 
+* Step 2 - ask Claude Code to use this conversion plan (see [PYTHON_CONVERSION_PLAN.md](PYTHON_CONVERSION_PLAN.md)) to implement the phases defined in the migration plan. Make sure the migration plan includes requirements for comprehensive test coverage of the converted code, via unit and integration tests.
 
-The conversion took Claude Code over 4 hours to complete. This includes the successful passing of all unit and integration tests. See boom_py/TEST_SUMMARY.md for details. The converted python codebase resides under boom_py folder.
+### Conversion Details
+* The [PYTHON_CONVERSION_PLAN.md](PYTHON_CONVERSION_PLAN.md) specified a migration timeline of 18 months, to be done in 8 phases. The conversion took Claude Code over 4 hours to complete. 
+* The conversion effort by Claude Code did not perform a line-by-line conversion of the original C++ code into Python. It analyzed the entire C++ codebase before coming up with a new modular design, then scaffold the entire project, before proceeding with the C++ to Python conversion.
+* The converted Python code resides under boom_py/ directory
+* Successful passing of all unit and integration tests. See [boom_py/TEST_SUMMARY.md](boom_py/TEST_SUMMARY.md) for details.
 
 
 ## Running the code
-See boom_py/README.md
+See [boom_py/README.md](boom_py/README.md)
