@@ -22,7 +22,7 @@ See [boom_py/README.md](boom_py/README.md)
 ## All prompts issued to Claude Code
 The complete list of prompts issued to Clause Code is listed below:
 
-> you're a SAS programming language expert. Analyze the existing SAS codebase before coming up with a plan to convert it to Python. Save this plan under PYTHON_CONVERSION_PLAN.md. Think hard.
+> you're a C++ and Python programming language expert. Analyze the existing C++ codebase before coming up with a plan to convert it to Python. Save this plan under PYTHON_CONVERSION_PLAN.md. Think hard.
 
 > Go ahead and implement all tasks in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage, via unit and integration tests.
 
