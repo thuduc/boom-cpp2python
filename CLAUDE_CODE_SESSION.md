@@ -2,7 +2,7 @@
 
 > You're a C++ and Python programming language expert. Analyze the existing C++ codebase before coming up with a plan to convert it to Python. Save this plan under PYTHON_CONVERSION_PLAN.md. Think hard
 
-> Implement phases 0 and 1 in @PYTHON_CONVERSION_PLAN_BEST.md. Put everything under impl-python. Make sure the converted Python code has comprehensive test coverage.
+> Implement phases 0 and 1 in @PYTHON_CONVERSION_PLAN.md. Put everything under impl-python. Make sure the converted Python code has comprehensive test coverage.
 
 ⏺ Summary
 
@@ -49,7 +49,7 @@
   for the remaining Phase 1 tasks (SpdMatrix, math functions, and utilities).
 
 
- > Implement phases 2 and 3 in @PYTHON_CONVERSION_PLAN_BEST.md. Make sure the converted Python code has comprehensive test coverage.
+ > Implement phases 2 and 3 in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage.
  
 
 ⏺ Summary
@@ -91,7 +91,7 @@
   documentation and comprehensive test coverage.
 
 
-> Implement phases 4 and 5 in @PYTHON_CONVERSION_PLAN_BEST.md. Make sure the converted Python code has comprehensive test coverage.
+> Implement phases 4 and 5 in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage.
 
  
 ⏺ Summary
@@ -173,7 +173,7 @@
   NumPy/SciPy for numerical computations. 
 
 
-> Implement phases 6 and 7 in @PYTHON_CONVERSION_PLAN_BEST.md. Make sure the converted Python code has comprehensive test coverage.
+> Implement phases 6 and 7 in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage.
  
 
    Summary of Phase 6 & 7 Implementation
@@ -279,7 +279,7 @@
   modeling in the BOOM Python library.
 
 
-> Implement phase 8 (the last phase) in @PYTHON_CONVERSION_PLAN_BEST.md. Make sure the converted Python code has comprehensive test coverage.
+> Implement phase 8 (the last phase) in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage.
 
 
 ⏺ Perfect! I have successfully completed Phase 8 - the final phase of the BOOM C++ to Python conversion plan. Here's a
