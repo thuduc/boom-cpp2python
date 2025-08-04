@@ -1,5 +1,4 @@
 ## GenAI Proof of Concept: C++ to Python conversion using Claude Code
-
 The purpose of this proof of concept is to find out if an LLM can take an existing complex  C++ codebase and convert it to Python. The project we will be using for this PoC is this BOOM C++ library for Bayesian modeling: https://github.com/steve-the-bayesian/BOOM
 
 ### LLM & AI Tool
