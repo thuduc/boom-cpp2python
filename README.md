@@ -18,7 +18,7 @@ The purpose of this proof of concept is to find out if an LLM can take an existi
 
 ### PoC Assessment
 * See [POC_ASSESSMENT.md](POC_ASSESSMENT.md) for detailed assessment of the C++ to Python conversion plan ([PYTHON_CONVERSION_PLAN.md](PYTHON_CONVERSION_PLAN.md)) and the conversion implementation.
-* We manually confirmed these findings, especially from Claude Code & Opus 4
+* We manually confirmed the core of these findings, especially from Claude Code (using Opus 4) since it does a much more comprehensive analysis of the code than Gemini
 
 ### Running the Generated Code
 See [impl-python/README.md](impl-python/README.md)
