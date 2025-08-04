@@ -6,7 +6,7 @@ The purpose of this proof of concept is to find out if an LLM can take an existi
 * LLM used: Claude Opus 4 (best coding LLM) - https://www.anthropic.com/claude/opus
 * AI tool used: Claude Code (best coding CLI due to its integration with Clause 4 LLMs) - https://www.anthropic.com/claude-code
 
-#### Conversion Process: 
+### Conversion Process: 
 * Step 1 - use Claude Code (together with Opus 4 LLM) to analyze an existing code repository, then ask it to put together a comprehensive conversion plan for converting the entire codebase from C++ to Python. 
 * Step 2 - ask Claude Code to use this conversion plan (see [PYTHON_CONVERSION_PLAN.md](PYTHON_CONVERSION_PLAN.md)) to implement all phases defined in the plan. Make sure the migration plan includes requirements for comprehensive test coverage of the converted code, via unit and integration tests.
 
@@ -16,5 +16,15 @@ The purpose of this proof of concept is to find out if an LLM can take an existi
 * The converted Python code resides under boom_py/ directory
 * Successful passing of all unit and integration tests. See [boom_py/TEST_SUMMARY.md](boom_py/TEST_SUMMARY.md) for details.
 
-## Running the code
+### Running the code
 See [boom_py/README.md](boom_py/README.md)
+
+## All prompts issued to Claude Code
+The complete list of prompts issued to Clause Code is listed below:
+
+> you're a SAS programming language expert. Analyze the existing SAS codebase before coming up with a plan to convert it to Python. Save this plan under PYTHON_CONVERSION_PLAN.md. Think hard.
+
+> Go ahead and implement all tasks in @PYTHON_CONVERSION_PLAN.md. Make sure the converted Python code has comprehensive test coverage, via unit and integration tests.
+
+> Run all tests of the converted Python code and save the test results to TEST_SUMMARY.md
+
